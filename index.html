@@ -1,3 +1,98 @@
+      /* --- أنماط جديدة للحراج --- */
+      .hraj-header {
+        margin-bottom: 40px;
+      }
+      .products-container {
+        width: 100%;
+        max-width: 1100px;
+        margin-bottom: 50px;
+      }
+      .section-title {
+        text-align: right;
+        font-size: 24px;
+        font-weight: 800;
+        color: #facc15; /* ذهبي */
+        margin-bottom: 20px;
+        padding-right: 15px;
+      }
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        padding: 0 15px;
+      }
+      .product-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+      }
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+      .product-image {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+      }
+      .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* تجعل الصورة تملأ المربع دون تشويه */
+      }
+      .product-details {
+        padding: 20px;
+        text-align: right;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .product-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 8px 0;
+        line-height: 1.4;
+      }
+      .product-loc {
+        font-size: 12px;
+        opacity: 0.5;
+        margin: 0 0 15px 0;
+      }
+      .product-price {
+        font-size: 20px;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 15px;
+      }
+      .pi-symbol {
+        color: #facc15;
+      }
+      .view-btn {
+        background: transparent;
+        color: #facc15;
+        border: 1px solid #facc15;
+        padding: 8px 0;
+        border-radius: 10px;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .view-btn:hover {
+        background: #facc15;
+        color: #0b1020;
+      }
+      
+      .support-section {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
 <main class="main-content">
   <div class="hraj-header">
     <h1 class="hero-title">حراج Pi</h1>
