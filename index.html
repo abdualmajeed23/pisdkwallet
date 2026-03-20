@@ -1,152 +1,93 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <title>سوق باي</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حراج باي - PiEarn</title>
+    <style>
+        :root {
+            --pi-color: #6d28d9; /* لون الباي الشهير */
+            --bg-light: #f4f4f9;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); margin: 0; padding-bottom: 70px; }
+        
+        /* الشريط العلوي */
+        .header { background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .user-info { display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--pi-color); }
+        .app-name { font-size: 1.2rem; font-weight: 800; color: #333; }
+        .balance { background: #eee; padding: 5px 10px; border-radius: 20px; font-size: 0.9rem; }
 
-  <!-- Pi Network SDK -->
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+        /* شريط العرض المتحرك */
+        .slider { overflow-x: auto; display: flex; gap: 15px; padding: 15px; scroll-snap-type: x mandatory; }
+        .slide-item { min-width: 80%; background: var(--pi-color); color: #fff; border-radius: 15px; padding: 20px; scroll-snap-align: start; position: relative; overflow: hidden; }
+        
+        /* شبكة المنتجات */
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
+        .product-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .product-img { width: 100%; height: 120px; object-fit: cover; background: #ddd; }
+        .product-info { padding: 10px; }
+        .product-title { font-size: 0.9rem; margin: 5px 0; font-weight: bold; }
+        .product-price { color: var(--pi-color); font-weight: bold; }
+        .actions { display: flex; justify-content: space-between; margin-top: 10px; }
+        .btn-action { border: none; background: #f0f0f0; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
 
-  <style>
-    body { font-family: Tahoma; padding: 20px; background: #f7f7f7; }
-    .card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; }
-    input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
-    button { padding: 10px 15px; background: #673ab7; color: white; border: none; border-radius: 5px; cursor: pointer; }
-  </style>
+        /* القائمة السفلية */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; }
+        .nav-item { text-align: center; font-size: 0.8rem; color: #666; text-decoration: none; }
+    </style>
 </head>
-
 <body>
 
-  <h1>سوق باي</h1>
+    <header class="header">
+        <div class="user-info">
+            <span id="username">جاري التحميل..</span>
+            <div class="balance"> <span id="balance">0.00</span> π</div>
+        </div>
+        <div class="app-name">حراج باي</div>
+    </header>
 
-  <div class="card" id="auth-section">
-    <button id="pi-login-btn">تسجيل الدخول عبر Pi</button>
-    <p id="user-info"></p>
-    <p id="user-balance"></p>
-  </div>
+    <div class="slider">
+        <div class="slide-item">
+            <h4>سيارة تويوتا كامري 2024</h4>
+            <p>أحدث إضافة في قسم السيارات</p>
+        </div>
+        <div class="slide-item" style="background: #22c55e;">
+            <h4>آيفون 15 برو ماكس</h4>
+            <p>عرض خاص لمستخدمي باي</p>
+        </div>
+    </div>
 
-  <div class="card" id="add-listing-section" style="display:none;">
-    <h2>إضافة إعلان</h2>
-    <input id="listing-title" placeholder="عنوان الإعلان" />
-    <input id="listing-price" placeholder="السعر" type="number" />
-    <textarea id="listing-description" placeholder="وصف الإعلان"></textarea>
-    <button id="add-listing-btn">نشر الإعلان</button>
-  </div>
+    <div class="products-grid">
+        <div class="product-card">
+            <img src="https://via.placeholder.com/150" class="product-img" alt="منتج">
+            <div class="product-info">
+                <p class="product-title">ساعة ذكية متطورة</p>
+                <p class="product-price">2.5 π</p>
+                <div class="actions">
+                    <button class="btn-action">🛒</button>
+                    <button class="btn-action" style="background: var(--pi-color); color: #fff;">شراء</button>
+                </div>
+            </div>
+        </div>
+        <div class="product-card">
+            <img src="https://via.placeholder.com/150" class="product-img" alt="منتج">
+            <div class="product-info">
+                <p class="product-title">طاولة خشبية مودرن</p>
+                <p class="product-price">15 π</p>
+                <div class="actions">
+                    <button class="btn-action">🛒</button>
+                    <button class="btn-action" style="background: var(--pi-color); color: #fff;">شراء</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <div class="card">
-    <h2>الإعلانات</h2>
-    <div id="listings-container"></div>
-  </div>
-
-<script>
-/* ---------------------------
-   تهيئة Pi SDK
----------------------------- */
-Pi.init({ version: "2.0" });
-
-let currentUser = null;
-
-/* ---------------------------
-   تسجيل الدخول عبر Pi
----------------------------- */
-async function loginWithPi() {
-  try {
-    const scopes = ["username", "payments"];
-    const auth = await Pi.authenticate(scopes, (payment) => {
-      console.log("Incomplete payment:", payment);
-    });
-
-    currentUser = {
-      piUserId: auth.user.uid,
-      username: auth.user.username,
-      walletAddress: auth.user.wallet_address
-    };
-
-    document.getElementById("user-info").innerText =
-      `مرحبًا ${currentUser.username} — Pi ID: ${currentUser.piUserId}`;
-
-    const balance = await getPiBalance(currentUser.walletAddress);
-    document.getElementById("user-balance").innerText =
-      `رصيدك: ${balance} PI`;
-
-    document.getElementById("add-listing-section").style.display = "block";
-
-  } catch (err) {
-    alert("فشل تسجيل الدخول عبر Pi");
-    console.error(err);
-  }
-}
-
-/* ---------------------------
-   جلب رصيد محفظة Pi
----------------------------- */
-async function getPiBalance(wallet) {
-  try {
-    const res = await fetch(`https://api.minepi.com/v2/accounts/${wallet}`);
-    const data = await res.json();
-    return data.balance || 0;
-  } catch {
-    return 0;
-  }
-}
-
-/* ---------------------------
-   إضافة إعلان (يُخزن محليًا)
----------------------------- */
-function addListing() {
-  if (!currentUser) return alert("سجل الدخول أولاً");
-
-  const title = document.getElementById("listing-title").value;
-  const price = document.getElementById("listing-price").value;
-  const description = document.getElementById("listing-description").value;
-
-  const listing = {
-    id: Date.now(),
-    title,
-    price,
-    description,
-    owner: currentUser.username,
-    ownerPiUserId: currentUser.piUserId
-  };
-
-  const listings = JSON.parse(localStorage.getItem("listings") || "[]");
-  listings.push(listing);
-  localStorage.setItem("listings", JSON.stringify(listings));
-
-  loadListings();
-}
-
-/* ---------------------------
-   تحميل الإعلانات
----------------------------- */
-function loadListings() {
-  const listings = JSON.parse(localStorage.getItem("listings") || "[]");
-  const container = document.getElementById("listings-container");
-
-  container.innerHTML = "";
-
-  listings.forEach(l => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <h3>${l.title}</h3>
-      <p>السعر: ${l.price} PI</p>
-      <p>${l.description}</p>
-      <small>البائع: ${l.owner} — ${l.ownerPiUserId}</small>
-    `;
-    container.appendChild(div);
-  });
-}
-
-/* ---------------------------
-   ربط الأحداث
----------------------------- */
-document.getElementById("pi-login-btn").addEventListener("click", loginWithPi);
-document.getElementById("add-listing-btn").addEventListener("click", addListing);
-
-loadListings();
-</script>
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item">🏠<br>الرئيسية</a>
+        <a href="#" class="nav-item">🗂️<br>الأقسام</a>
+        <a href="#" class="nav-item">❤️<br>المفضلة</a>
+        <a href="#" class="nav-item">👤<br>حسابي</a>
+    </nav>
 
 </body>
 </html>
