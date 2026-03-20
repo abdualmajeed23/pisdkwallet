@@ -1,262 +1,152 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>حراج باي | Haraj Pi Luxury</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <style>
-      :root {
-        --primary-purple: #4834d4; /* بنفسجي ملكي */
-        --accent-gold: #fbc531;   /* ذهبي مطفي */
-        --bg-ivory: #fdfbf7;      /* كريمي دافئ */
-        --text-dark: #2d3436;     /* بني غامق جداً */
-        --card-shadow: 0 10px 25px rgba(72, 52, 212, 0.1);
-      }
+<head>
+  <meta charset="UTF-8" />
+  <title>سوق باي</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-      body {
-        margin: 0;
-        background-color: var(--bg-ivory);
-        font-family: 'Cairo', sans-serif;
-        color: var(--text-dark);
-        padding-bottom: 100px;
-        overflow-x: hidden;
-      }
+  <!-- Pi Network SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-      /* --- الهيدر الفخم --- */
-      header {
-        background: #fff;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.03);
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-      }
+  <style>
+    body { font-family: Tahoma; padding: 20px; background: #f7f7f7; }
+    .card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; }
+    input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+    button { padding: 10px 15px; background: #673ab7; color: white; border: none; border-radius: 5px; cursor: pointer; }
+  </style>
+</head>
 
-      .user-profile { display: flex; align-items: center; gap: 10px; }
-      .avatar { width: 40px; height: 40px; border: 2px solid var(--accent-gold); border-radius: 50%; overflow: hidden; background: #eee; }
-      .avatar img { width: 100%; height: 100%; object-fit: cover; }
+<body>
 
-      .brand-name { font-weight: 900; font-size: 22px; color: var(--primary-purple); letter-spacing: -1px; }
-      
-      .wallet-box { text-align: left; }
-      .pi-balance { color: var(--accent-gold); font-weight: 800; font-size: 14px; }
+  <h1>سوق باي</h1>
 
-      /* --- السلايدر المتحرك --- */
-      .hero-slider {
-        padding: 20px 0;
-        display: flex;
-        overflow-x: auto;
-        gap: 15px;
-        padding-right: 20px;
-        scrollbar-width: none;
-      }
-      .hero-slider::-webkit-scrollbar { display: none; }
+  <div class="card" id="auth-section">
+    <button id="pi-login-btn">تسجيل الدخول عبر Pi</button>
+    <p id="user-info"></p>
+    <p id="user-balance"></p>
+  </div>
 
-      .slide-card {
-        min-width: 280px;
-        height: 160px;
-        border-radius: 25px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: var(--card-shadow);
-      }
-      .slide-card img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7); }
-      .slide-info { position: absolute; bottom: 15px; right: 15px; color: #fff; }
+  <div class="card" id="add-listing-section" style="display:none;">
+    <h2>إضافة إعلان</h2>
+    <input id="listing-title" placeholder="عنوان الإعلان" />
+    <input id="listing-price" placeholder="السعر" type="number" />
+    <textarea id="listing-description" placeholder="وصف الإعلان"></textarea>
+    <button id="add-listing-btn">نشر الإعلان</button>
+  </div>
 
-      /* --- شبكة الأقسام --- */
-      .categories-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        padding: 0 20px;
-        margin-bottom: 25px;
-      }
-      .cat-card {
-        background: #fff;
-        padding: 12px 5px;
-        border-radius: 18px;
-        text-align: center;
-        font-size: 10px;
-        font-weight: 700;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-        border: 1px solid #f1f1f1;
-      }
-      .cat-icon { font-size: 20px; display: block; margin-bottom: 5px; }
+  <div class="card">
+    <h2>الإعلانات</h2>
+    <div id="listings-container"></div>
+  </div>
 
-      /* --- بطاقات المنتجات --- */
-      .section-title { padding: 0 20px; margin-bottom: 15px; font-weight: 800; font-size: 18px; border-right: 4px solid var(--accent-gold); margin-right: 20px; }
-      
-      .products-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        padding: 0 20px;
-      }
+<script>
+/* ---------------------------
+   تهيئة Pi SDK
+---------------------------- */
+Pi.init({ version: "2.0" });
 
-      .product-card {
-        background: #fff;
-        border-radius: 25px;
-        overflow: hidden;
-        border: 1px solid #f0f0f0;
-        box-shadow: var(--card-shadow);
-        position: relative;
-      }
+let currentUser = null;
 
-      .badge-premium { position: absolute; top: 10px; right: 10px; background: var(--primary-purple); color: #fff; padding: 3px 8px; border-radius: 8px; font-size: 9px; font-weight: 700; z-index: 10; }
+/* ---------------------------
+   تسجيل الدخول عبر Pi
+---------------------------- */
+async function loginWithPi() {
+  try {
+    const scopes = ["username", "payments"];
+    const auth = await Pi.authenticate(scopes, (payment) => {
+      console.log("Incomplete payment:", payment);
+    });
 
-      .product-img { height: 140px; width: 100%; object-fit: cover; }
-      
-      .product-body { padding: 12px; }
-      .p-title { font-size: 12px; font-weight: 700; height: 34px; overflow: hidden; margin-bottom: 5px; }
-      .p-price-pi { color: var(--primary-purple); font-weight: 900; font-size: 15px; margin-bottom: 10px; display: block; }
-      .p-price-sar { font-size: 10px; color: #999; margin-bottom: 10px; display: block; }
+    currentUser = {
+      piUserId: auth.user.uid,
+      username: auth.user.username,
+      walletAddress: auth.user.wallet_address
+    };
 
-      .action-btns { display: flex; gap: 5px; }
-      .buy-btn { flex: 1; background: var(--primary-purple); color: #fff; border: none; padding: 10px; border-radius: 12px; font-family: 'Cairo'; font-weight: 700; font-size: 11px; cursor: pointer; }
-      .cart-btn { width: 40px; background: #f4f4f9; border: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    document.getElementById("user-info").innerText =
+      `مرحبًا ${currentUser.username} — Pi ID: ${currentUser.piUserId}`;
 
-      /* --- النافذة السفلية (Navigation) --- */
-      .nav-bar {
-        position: fixed;
-        bottom: 0; width: 100%;
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(10px);
-        display: flex;
-        justify-content: space-around;
-        padding: 15px 0 30px;
-        border-top-left-radius: 30px;
-        border-top-right-radius: 30px;
-        box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-      }
-      .nav-item { text-align: center; text-decoration: none; color: #bbb; font-size: 10px; font-weight: 600; }
-      .nav-item.active { color: var(--primary-purple); }
-      .plus-btn { width: 55px; height: 55px; background: var(--primary-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 30px; margin-top: -45px; border: 5px solid var(--bg-ivory); box-shadow: 0 8px 15px rgba(72, 52, 212, 0.3); }
+    const balance = await getPiBalance(currentUser.walletAddress);
+    document.getElementById("user-balance").innerText =
+      `رصيدك: ${balance} PI`;
 
-    </style>
-  </head>
-  <body>
+    document.getElementById("add-listing-section").style.display = "block";
 
-    <header>
-      <div class="user-profile">
-        <div class="avatar"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" id="uImg"></div>
-        <div style="display: flex; flex-direction: column;">
-          <span id="uName" style="font-weight: 800; font-size: 12px;">جاري الاتصال...</span>
-          <span class="pi-balance">π <span id="uBalance">314.15</span></span>
-        </div>
-      </div>
-      <div class="brand-name">حراج باي</div>
-      <div class="wallet-box">
-         <span style="font-size: 18px;">🔔</span>
-      </div>
-    </header>
+  } catch (err) {
+    alert("فشل تسجيل الدخول عبر Pi");
+    console.error(err);
+  }
+}
 
-    <div class="hero-slider">
-      <div class="slide-card">
-        <img src="https://images.unsplash.com/photo-1606206161413-568e9167262c?q=80&w=600">
-        <div class="slide-info"><b>كامري 2026</b><br><small>أحدث العروض الواصلة</small></div>
-      </div>
-      <div class="slide-card">
-        <img src="https://images.unsplash.com/photo-1663499482523-1c0c1b489467?q=80&w=600">
-        <div class="slide-info"><b>آيفون 16 برو</b><br><small>تسوق أرقى الأجهزة</small></div>
-      </div>
-    </div>
+/* ---------------------------
+   جلب رصيد محفظة Pi
+---------------------------- */
+async function getPiBalance(wallet) {
+  try {
+    const res = await fetch(`https://api.minepi.com/v2/accounts/${wallet}`);
+    const data = await res.json();
+    return data.balance || 0;
+  } catch {
+    return 0;
+  }
+}
 
-    <div class="categories-grid">
-      <div class="cat-card"><span class="cat-icon">🚗</span>سيارات</div>
-      <div class="cat-card"><span class="cat-icon">📱</span>أجهزة</div>
-      <div class="cat-card"><span class="cat-icon">🏠</span>عقار</div>
-      <div class="cat-card"><span class="cat-icon">🛋️</span>أثاث</div>
-    </div>
+/* ---------------------------
+   إضافة إعلان (يُخزن محليًا)
+---------------------------- */
+function addListing() {
+  if (!currentUser) return alert("سجل الدخول أولاً");
 
-    <h2 class="section-title">الإعلانات المميزة</h2>
+  const title = document.getElementById("listing-title").value;
+  const price = document.getElementById("listing-price").value;
+  const description = document.getElementById("listing-description").value;
 
-    <div class="products-container" id="productGrid">
-      <div class="product-card">
-        <div class="badge-premium">مميز ★</div>
-        <img src="https://images.unsplash.com/photo-1620625515032-6ed0c1790c75?q=80&w=600" class="product-img">
-        <div class="product-body">
-          <div class="p-title">ساعة رولكس ديت جست أصلية</div>
-          <span class="p-price-sar">السعر: 45,000 ريال</span>
-          <span class="p-price-pi">π <span class="calc" data-sar="45000"></span></span>
-          <div class="action-btns">
-            <button class="buy-btn" onclick="pay(45000, 'Rolex Watch')">شراء</button>
-            <button class="cart-btn">🛒</button>
-          </div>
-        </div>
-      </div>
+  const listing = {
+    id: Date.now(),
+    title,
+    price,
+    description,
+    owner: currentUser.username,
+    ownerPiUserId: currentUser.piUserId
+  };
 
-      <div class="product-card">
-        <img src="https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=600" class="product-img">
-        <div class="product-body">
-          <div class="p-title">ماك بوك برو M3 الجديد</div>
-          <span class="p-price-sar">السعر: 8,500 ريال</span>
-          <span class="p-price-pi">π <span class="calc" data-sar="8500"></span></span>
-          <div class="action-btns">
-            <button class="buy-btn" onclick="pay(8500, 'Macbook M3')">شراء</button>
-            <button class="cart-btn">🛒</button>
-          </div>
-        </div>
-      </div>
-    </div>
+  const listings = JSON.parse(localStorage.getItem("listings") || "[]");
+  listings.push(listing);
+  localStorage.setItem("listings", JSON.stringify(listings));
 
-    <nav class="nav-bar">
-      <a href="#" class="nav-item active"><span style="font-size:22px; display:block">🏠</span>الرئيسية</a>
-      <a href="#" class="nav-item"><span style="font-size:22px; display:block">📂</span>الأقسام</a>
-      <div class="plus-btn">+</div>
-      <a href="#" class="nav-item"><span style="font-size:22px; display:block">❤️</span>المفضلة</a>
-      <a href="#" class="nav-item"><span style="font-size:22px; display:block">👤</span>حسابي</a>
-    </nav>
+  loadListings();
+}
 
-    <script>
-      // قيمة الإجماع المتفق عليها بالريال
-      const GCV_SAR = 1178133.75; 
+/* ---------------------------
+   تحميل الإعلانات
+---------------------------- */
+function loadListings() {
+  const listings = JSON.parse(localStorage.getItem("listings") || "[]");
+  const container = document.getElementById("listings-container");
 
-      // 1. حساب وتحويل الأسعار فورياً
-      function initPrices() {
-        document.querySelectorAll('.calc').forEach(el => {
-          const sar = parseFloat(el.getAttribute('data-sar'));
-          el.textContent = (sar / GCV_SAR).toFixed(7);
-        });
-      }
+  container.innerHTML = "";
 
-      // 2. وظيفة الدفع الفعلي عبر المحفظة
-      async function pay(sarAmount, title) {
-        const piAmount = parseFloat((sarAmount / GCV_SAR).toFixed(7));
-        if (!window.Pi) return alert("الرجاء الفتح عبر متصفح باي");
+  listings.forEach(l => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <h3>${l.title}</h3>
+      <p>السعر: ${l.price} PI</p>
+      <p>${l.description}</p>
+      <small>البائع: ${l.owner} — ${l.ownerPiUserId}</small>
+    `;
+    container.appendChild(div);
+  });
+}
 
-        try {
-          const payment = await window.Pi.createPayment({
-            amount: piAmount,
-            memo: "شراء " + title + " من حراج باي",
-            metadata: { product: title }
-          }, {
-            onReadyForServerApproval: (id) => console.log("Approved", id),
-            onReadyForServerCompletion: (id, txid) => alert("تمت العملية بنجاح! رقم المعاملة: " + txid),
-            onCancel: (id) => console.log("Cancelled"),
-            onError: (e) => console.error(e)
-          });
-        } catch (err) { console.error(err); }
-      }
+/* ---------------------------
+   ربط الأحداث
+---------------------------- */
+document.getElementById("pi-login-btn").addEventListener("click", loginWithPi);
+document.getElementById("add-listing-btn").addEventListener("click", addListing);
 
-      // 3. ربط الملف الشخصي
-      async function start() {
-        if (window.Pi) {
-          window.Pi.init({ version: "2.0", sandbox: false });
-          try {
-            const auth = await window.Pi.authenticate(["username", "payments"], (inc) => {});
-            document.getElementById('uName').textContent = auth.user.username;
-            document.getElementById('uImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${auth.user.username}`;
-          } catch (e) { document.getElementById('uName').textContent = "ضيف"; }
-        }
-        initPrices();
-      }
+loadListings();
+</script>
 
-      window.onload = start;
-    </script>
-  </body>
+</body>
 </html>
