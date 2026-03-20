@@ -3,299 +3,119 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>حراج باي | HarajPi</title>
+    <title>متجر GCV - دفع مباشر</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
       :root {
-        --bg-color: #f8f9fe;
+        --bg-color: #f4f7fe;
         --primary-purple: #6c5ce7;
-        --dark-purple: #4834d4;
-        --text-dark: #2d3436;
-        --card-bg: #ffffff;
         --gold: #fbc531;
       }
-
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: var(--bg-color);
-        font-family: 'Cairo', sans-serif;
-        color: var(--text-dark);
-        padding-bottom: 90px;
-      }
-
-      /* الشريط العلوي */
-      header {
-        background: #fff;
-        padding: 10px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #eee;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-      }
-
-      .user-pill {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: #f0f0f5;
-        padding: 5px 12px;
-        border-radius: 20px;
-      }
-
-      /* أحدث المنتجات (سلايدر) */
-      .top-carousel {
-        background: #fff;
-        padding: 15px 0;
-        overflow-x: auto;
-        display: flex;
-        gap: 15px;
-        padding-right: 20px;
-        border-bottom: 1px solid #eee;
-        scrollbar-width: none;
-      }
-      .top-carousel::-webkit-scrollbar { display: none; }
-
-      .carousel-item { min-width: 100px; text-align: center; }
-      .carousel-img {
-        width: 60px; height: 60px;
-        background: #f0f0f5;
-        border-radius: 18px;
-        margin: 0 auto 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        overflow: hidden; /* لقص الصورة إذا كانت كبيرة */
-      }
-      .carousel-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* تجعل الصورة تملأ المربع دون تشويه */
-      }
-
-      /* شبكة المنتجات */
-      .section-title { padding: 20px; font-weight: 800; font-size: 20px; margin: 0; }
-      
-      .products-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        padding: 0 15px;
-      }
-
-      .product-card {
-        background: var(--card-bg);
-        border-radius: 25px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.03);
-        border: 1px solid #f0f0f0;
-      }
-
-      .card-image {
-        height: 140px;
-        background: #f1f2f6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 50px;
-        overflow: hidden; /* لقص الصورة */
-      }
-      .card-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .card-body { padding: 12px; }
-      .card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; height: 40px; overflow: hidden; text-align: right; }
-      .price-value { color: var(--dark-purple); font-weight: 800; font-size: 16px; text-align: right; display: block; }
-
-      /* شريط التنقل السفلي */
-      .bottom-nav {
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        background: #fff;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        padding: 10px 0 25px;
-        box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-        border-top-left-radius: 30px;
-        border-top-right-radius: 30px;
-        z-index: 2000;
-      }
-
-      .nav-item { text-align: center; color: #aaa; font-size: 11px; text-decoration: none; }
-      .nav-item.active { color: var(--primary-purple); }
-
-      .center-add {
-        width: 55px; height: 55px;
-        background: var(--primary-purple);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-size: 30px;
-        margin-top: -45px;
-        box-shadow: 0 8px 15px rgba(108, 92, 231, 0.3);
-        border: 5px solid var(--bg-color);
-        cursor: pointer;
-      }
-
-      /* النافذة المنبثقة (Popup) */
-      .modal-overlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.6);
-        display: none;
-        align-items: flex-end;
-        z-index: 3000;
-      }
-      .modal-content {
-        background: #fff;
-        width: 100%;
-        border-top-left-radius: 30px;
-        border-top-right-radius: 30px;
-        padding: 25px;
-        animation: slideUp 0.3s ease-out;
-      }
-      @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-      
-      .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-      .modal-body input, .modal-body select, .modal-body textarea {
-        width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 12px; font-family: 'Cairo'; box-sizing: border-box; text-align: right;
-      }
-      .submit-btn {
-        width: 100%; background: var(--primary-purple); color: #fff; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer;
-      }
+      body { margin: 0; background-color: var(--bg-color); font-family: 'Cairo', sans-serif; padding-bottom: 50px; }
+      .container { padding: 15px; }
+      .header-title { text-align: center; padding: 20px; background: #fff; margin-bottom: 10px; }
+      .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+      .card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; border: 1px solid #eee; }
+      .card-img { height: 120px; width: 100%; object-fit: cover; }
+      .card-content { padding: 12px; }
+      .card-title { font-size: 13px; font-weight: 700; height: 35px; margin-bottom: 5px; }
+      .price-pi { font-size: 14px; font-weight: 800; color: var(--primary-purple); display: block; margin-bottom: 10px; }
+      .btn-buy { width: 100%; background: var(--primary-purple); color: #fff; border: none; padding: 10px; border-radius: 10px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; transition: 0.3s; }
+      .btn-buy:active { transform: scale(0.95); opacity: 0.8; }
+      #status-msg { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #333; color: #fff; padding: 10px; border-radius: 10px; text-align: center; font-size: 12px; display: none; z-index: 10000; }
     </style>
   </head>
   <body>
 
-    <header>
-      <div class="user-pill">
-        <span id="userAvatar">👤</span>
-        <span id="usernameDisplay" style="font-weight: 700; font-size: 13px;">جاري الاتصال...</span>
-      </div>
-      <div style="font-weight: 900; color: var(--primary-purple);">HARAJ PI</div>
-    </header>
+    <div id="status-msg">جاري المعالجة...</div>
 
-    <div class="top-carousel">
-        <div class="carousel-item"><div class="carousel-img"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=300" alt="سيارات"></div><div style="font-size: 10px;">سيارات</div></div>
-        <div class="carousel-item"><div class="carousel-img"><img src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=300" alt="جوالات"></div><div style="font-size: 10px;">جوالات</div></div>
-        <div class="carousel-item"><div class="carousel-img"><img src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?q=80&w=300" alt="عقارات"></div><div style="font-size: 10px;">عقارات</div></div>
-        <div class="carousel-item"><div class="carousel-img"><img src="https://images.unsplash.com/photo-1619229666799-24ac28f442b3?q=80&w=300" alt="ساعات"></div><div style="font-size: 10px;">ساعات</div></div>
-        <div class="carousel-item"><div class="carousel-img"><img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=300" alt="أجهزة"></div><div style="font-size: 10px;">أجهزة</div></div>
+    <div class="header-title">
+      <h2 style="margin:0">سوق Pi (قيمة GCV)</h2>
+      <p style="font-size: 11px; color: #666;">سعر الباي: 1,178,133.75 ريال</p>
     </div>
 
-    <h2 class="section-title">الإعلانات المميزة</h2>
+    <div class="container">
+      <div class="products-grid">
+        
+        <div class="card">
+          <img src="https://images.unsplash.com/photo-1663499482523-1c0c1b489467?q=80&w=400" class="card-img">
+          <div class="card-content">
+            <div class="card-title">آيفون 16 برو ماكس</div>
+            <div class="price-pi">π <span class="calc-pi" data-sar="5000"></span></div>
+            <button class="btn-buy" onclick="handlePayment(5000, 'آيفون 16 برو ماكس')">شراء الآن</button>
+          </div>
+        </div>
 
-    <div class="products-grid">
-      <div class="product-card">
-        <div class="card-image">
-          <img src="https://images.unsplash.com/photo-1606206161413-568e9167262c?q=80&w=600" alt="تويوتا كامري 2023">
+        <div class="card">
+          <img src="https://images.unsplash.com/photo-1606206161413-568e9167262c?q=80&w=400" class="card-img">
+          <div class="card-content">
+            <div class="card-title">تويوتا كامري 2023</div>
+            <div class="price-pi">π <span class="calc-pi" data-sar="120000"></span></div>
+            <button class="btn-buy" onclick="handlePayment(120000, 'تويوتا كامري 2023')">شراء الآن</button>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="card-title">تويوتا كامري 2023 فل كامل</div>
-          <div class="price-value">85,000 Pi</div>
-          <div style="font-size: 10px; color: #999; margin-top: 5px; text-align: right;">📍 جدة</div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="card-image">
-          <img src="https://images.unsplash.com/photo-1663499482523-1c0c1b489467?q=80&w=600" alt="آيفون 16 برو ماكس">
-        </div>
-        <div class="card-body">
-          <div class="card-title">آيفون 16 برو ماكس 256 جيجا</div>
-          <div class="price-value">4,500 Pi</div>
-          <div style="font-size: 10px; color: #999; margin-top: 5px; text-align: right;">📍 الرياض</div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="card-image">
-          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=600" alt="شقة للبيع">
-        </div>
-        <div class="card-body">
-          <div class="card-title">شقة للبيع 3 غرف وصالة</div>
-          <div class="price-value">450,000 Pi</div>
-          <div style="font-size: 10px; color: #999; margin-top: 5px; text-align: right;">📍 الرياض</div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="card-image">
-          <img src="https://images.unsplash.com/photo-1620625515032-6ed0c1790c75?q=80&w=600" alt="ساعة رولكس">
-        </div>
-        <div class="card-body">
-          <div class="card-title">ساعة رولكس ديت جست أصلية</div>
-          <div class="price-value">12,000 Pi</div>
-          <div style="font-size: 10px; color: #999; margin-top: 5px; text-align: right;">📍 مكة المكرمة</div>
-        </div>
-      </div>
-    </div>
 
-    <nav class="bottom-nav">
-      <a href="#" class="nav-item active">🏠<br>الرئيسية</a>
-      <a href="#" class="nav-item">📂<br>الأقسام</a>
-      <div class="center-add" id="openModal">+</div>
-      <a href="#" class="nav-item">❤️<br>المفضلة</a>
-      <a href="#" class="nav-item">👤<br>حسابي</a>
-    </nav>
-
-    <div id="addModal" class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 style="margin:0">إضافة إعلان جديد</h3>
-          <span id="closeModal" style="font-size:30px; cursor:pointer">&times;</span>
-        </div>
-        <div class="modal-body">
-          <input type="text" placeholder="ما هي السلعة التي تود بيعها؟">
-          <input type="number" placeholder="السعر المطلوب بـ Pi">
-          <select>
-            <option>اختر القسم المناسب</option>
-            <option>سيارات</option>
-            <option>إلكترونيات</option>
-            <option>عقارات</option>
-            <option>ساعات ومجوهرات</option>
-          </select>
-          <textarea placeholder="اكتب تفاصيل الإعلان هنا..." rows="3"></textarea>
-          <button class="submit-btn">نشر الإعلان في الحراج</button>
-        </div>
       </div>
     </div>
 
     <script>
-      // 1. برمجة النافذة المنبثقة (Popup)
-      const modal = document.getElementById('addModal');
-      const openBtn = document.getElementById('openModal');
-      const closeBtn = document.getElementById('closeModal');
+      const GCV_SAR = 1178133.75; // قيمة الإجماع بالريال
 
-      openBtn.onclick = () => modal.style.display = "flex";
-      closeBtn.onclick = () => modal.style.display = "none";
-      window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; }
+      // 1. حساب الأسعار وعرضها عند التحميل
+      function updateDisplayPrices() {
+        document.querySelectorAll('.calc-pi').forEach(el => {
+          const sar = parseFloat(el.getAttribute('data-sar'));
+          el.textContent = (sar / GCV_SAR).toFixed(7);
+        });
+      }
+      window.onload = updateDisplayPrices;
 
-      // 2. ربط شبكة Pi وتجلب اسم المستخدم
-      async function initPi() {
-        if (window.Pi) {
-          try {
-            // تهيئة Pi SDK
-            const auth = await window.Pi.init({ version: "2.0", sandbox: false });
-            // طلب المصادقة (اسم المستخدم والمحفظة)
-            const user = await window.Pi.authenticate(["username", "payments"], function(incomplete) {});
-            // عرض اسم المستخدم
-            document.getElementById('usernameDisplay').textContent = user.user.username;
-          } catch (err) {
-            // إذا لم يتم المصادقة (Guest User)
-            document.getElementById('usernameDisplay').textContent = "مستخدم زائر";
-          }
+      // 2. وظيفة الدفع الفعلي عبر Pi SDK
+      async function handlePayment(sarAmount, productName) {
+        const piAmount = (sarAmount / GCV_SAR).toFixed(7);
+        const statusBox = document.getElementById('status-msg');
+
+        if (!window.Pi) {
+          alert("الرجاء فتح التطبيق من متصفح Pi");
+          return;
+        }
+
+        try {
+          statusBox.style.display = "block";
+          statusBox.textContent = "جاري تحضير عملية الدفع لـ " + productName;
+
+          const payment = await window.Pi.createPayment({
+            amount: parseFloat(piAmount),
+            memo: "شراء " + productName + " من متجر حراج باي",
+            metadata: { sar_price: sarAmount, product: productName }
+          }, {
+            onReadyForServerApproval: (paymentId) => {
+              statusBox.textContent = "بانتظار موافقة الخادم...";
+              // هنا يجب إرسال paymentId لخادمك (Netlify Function) للموافقة
+              console.log("Payment ID:", paymentId);
+            },
+            onReadyForServerCompletion: (paymentId, txid) => {
+              statusBox.textContent = "تم الدفع بنجاح! رقم المعاملة: " + txid;
+              alert("شكراً لك! تم استلام " + piAmount + " Pi بنجاح.");
+            },
+            onCancel: (paymentId) => {
+              statusBox.textContent = "تم إلغاء العملية";
+              setTimeout(() => statusBox.style.display = "none", 3000);
+            },
+            onError: (error, payment) => {
+              statusBox.textContent = "خطأ: " + error.message;
+            }
+          });
+        } catch (err) {
+          statusBox.textContent = "فشلت العملية: " + err.message;
         }
       }
-      initPi();
+
+      // تهيئة Pi SDK
+      if (window.Pi) {
+        window.Pi.init({ version: "2.0", sandbox: false });
+      }
     </script>
   </body>
 </html>
