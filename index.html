@@ -3,119 +3,189 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>متجر GCV - دفع مباشر</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <title>حراج باي | HarajPi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
       :root {
-        --bg-color: #f4f7fe;
+        --bg-color: #f8f9fe;
         --primary-purple: #6c5ce7;
+        --dark-purple: #4834d4;
+        --text-dark: #2d3436;
+        --card-bg: #ffffff;
         --gold: #fbc531;
       }
-      body { margin: 0; background-color: var(--bg-color); font-family: 'Cairo', sans-serif; padding-bottom: 50px; }
-      .container { padding: 15px; }
-      .header-title { text-align: center; padding: 20px; background: #fff; margin-bottom: 10px; }
-      .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-      .card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; border: 1px solid #eee; }
-      .card-img { height: 120px; width: 100%; object-fit: cover; }
-      .card-content { padding: 12px; }
-      .card-title { font-size: 13px; font-weight: 700; height: 35px; margin-bottom: 5px; }
-      .price-pi { font-size: 14px; font-weight: 800; color: var(--primary-purple); display: block; margin-bottom: 10px; }
-      .btn-buy { width: 100%; background: var(--primary-purple); color: #fff; border: none; padding: 10px; border-radius: 10px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; transition: 0.3s; }
-      .btn-buy:active { transform: scale(0.95); opacity: 0.8; }
-      #status-msg { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #333; color: #fff; padding: 10px; border-radius: 10px; text-align: center; font-size: 12px; display: none; z-index: 10000; }
+
+      body { margin: 0; background-color: var(--bg-color); font-family: 'Cairo', sans-serif; color: var(--text-dark); padding-bottom: 90px; }
+
+      /* --- 1. الهيدر (الشريط العلوي) --- */
+      header { background: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; }
+      
+      .logo { font-weight: 900; color: var(--primary-purple); font-size: 20px; }
+      
+      .user-info { display: flex; align-items: center; gap: 8px; background: #f0f2f5; padding: 5px 12px; border-radius: 50px; font-size: 11px; }
+      .avatar-circle { width: 30px; height: 30px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: 14px; }
+      #walletBalance { color: var(--dark-purple); font-weight: 700; }
+
+      /* --- 2. سلايدر المنتجات المضافة مؤخراً --- */
+      .top-carousel { background: #fff; padding: 15px 0; overflow-x: auto; display: flex; gap: 12px; padding-right: 20px; border-bottom: 1px solid #eee; scrollbar-width: none; }
+      .top-carousel::-webkit-scrollbar { display: none; }
+
+      .carousel-item { min-width: 130px; text-align: center; }
+      .carousel-img { width: 100%; height: 80px; background: #f0f0f5; border-radius: 15px; margin-bottom: 5px; overflow: hidden; border: 1px solid #e0e0e0; }
+      .carousel-img img { width: 100%; height: 100%; object-fit: cover; }
+      .carousel-title { font-size: 10px; font-weight: 600; color: #555; height: 30px; overflow: hidden; }
+
+      /* --- 3. شبكة المنتجات الرئيسية --- */
+      .section-title { padding: 20px 15px; font-weight: 800; font-size: 18px; margin: 0; }
+      
+      .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px; }
+
+      .product-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.03); position: relative; border: 1px solid #f0f0f0; transition: transform 0.2s; }
+      .product-card:active { transform: scale(0.98); }
+
+      .card-image { height: 130px; background: #f1f2f6; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+      .card-image img { width: 100%; height: 100%; object-fit: cover; }
+      
+      .fav-icon { position: absolute; top: 10px; left: 10px; background: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #888; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
+
+      .card-body { padding: 10px; }
+      .card-title { font-size: 13px; font-weight: 700; height: 35px; overflow: hidden; margin-bottom: 8px; text-align: right; }
+      .price-pi { color: var(--dark-purple); font-weight: 800; font-size: 15px; text-align: right; display: block; margin-bottom: 10px; }
+
+      .card-actions { display: flex; gap: 6px; }
+      .btn-buy { flex: 2; background: var(--primary-purple); color: #fff; border: none; padding: 8px; border-radius: 10px; font-family: 'Cairo'; font-weight: 600; font-size: 12px; cursor: pointer; }
+      .btn-cart { width: 35px; background: #f0f0f5; border: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+
+      /* --- 4. شريط التنقل السفلي --- */
+      .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; display: flex; justify-content: space-around; align-items: center; padding: 10px 0 25px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); border-top-left-radius: 25px; border-top-right-radius: 25px; z-index: 2000; }
+      
+      .nav-item { text-align: center; color: #aaa; font-size: 10px; text-decoration: none; display: flex; flex-direction: column; align-items: center; }
+      .nav-item.active { color: var(--primary-purple); }
+      .nav-icon { font-size: 20px; display: block; margin-bottom: 3px; }
     </style>
   </head>
   <body>
 
-    <div id="status-msg">جاري المعالجة...</div>
+    <header>
+      <div class="logo">حراج باي</div>
+      <div class="user-info">
+        <div class="avatar-circle" id="userAvatar">؟</div>
+        <div style="display: flex; flex-direction: column;">
+          <span id="usernameDisplay" style="font-weight: 700;">جاري الربط...</span>
+          <span id="walletBalance">المحفظة: -- Pi</span>
+        </div>
+      </div>
+    </header>
 
-    <div class="header-title">
-      <h2 style="margin:0">سوق Pi (قيمة GCV)</h2>
-      <p style="font-size: 11px; color: #666;">سعر الباي: 1,178,133.75 ريال</p>
+    <div class="top-carousel">
+        <div class="carousel-item">
+            <div class="carousel-img"><img src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=300"></div>
+            <div class="carousel-title">آيفون 16 (جديد)</div>
+        </div>
+        <div class="carousel-item">
+            <div class="carousel-img"><img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=300"></div>
+            <div class="carousel-title">تويوتا كامري 2023</div>
+        </div>
+        <div class="carousel-item">
+            <div class="carousel-img"><img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=300"></div>
+            <div class="carousel-title">ماك بوك اير</div>
+        </div>
     </div>
 
-    <div class="container">
-      <div class="products-grid">
-        
-        <div class="card">
-          <img src="https://images.unsplash.com/photo-1663499482523-1c0c1b489467?q=80&w=400" class="card-img">
-          <div class="card-content">
-            <div class="card-title">آيفون 16 برو ماكس</div>
-            <div class="price-pi">π <span class="calc-pi" data-sar="5000"></span></div>
-            <button class="btn-buy" onclick="handlePayment(5000, 'آيفون 16 برو ماكس')">شراء الآن</button>
+    <h2 class="section-title">أحدث الإعلانات المميزة</h2>
+
+    <div class="products-grid">
+      <div class="product-card">
+        <span class="fav-icon">♡</span>
+        <div class="card-image"><img src="https://images.unsplash.com/photo-1606206161413-568e9167262c?q=80&w=600"></div>
+        <div class="card-body">
+          <div class="card-title">تويوتا كامري 2023 فل كامل</div>
+          <span class="price-pi">85,000 PI</span>
+          <div class="card-actions">
+            <button class="btn-buy" onclick="testPayment(85000, 'Toyota Camry')">شراء الآن</button>
+            <button class="btn-cart">🛒</button>
           </div>
         </div>
+      </div>
 
-        <div class="card">
-          <img src="https://images.unsplash.com/photo-1606206161413-568e9167262c?q=80&w=400" class="card-img">
-          <div class="card-content">
-            <div class="card-title">تويوتا كامري 2023</div>
-            <div class="price-pi">π <span class="calc-pi" data-sar="120000"></span></div>
-            <button class="btn-buy" onclick="handlePayment(120000, 'تويوتا كامري 2023')">شراء الآن</button>
+      <div class="product-card">
+        <span class="fav-icon">♡</span>
+        <div class="card-image"><img src="https://images.unsplash.com/photo-1663499482523-1c0c1b489467?q=80&w=600"></div>
+        <div class="card-body">
+          <div class="card-title">آيفون 15 برو ماكس - 256GB</div>
+          <span class="price-pi">4,500 PI</span>
+          <div class="card-actions">
+            <button class="btn-buy" onclick="testPayment(4500, 'Iphone 15 Pro')">شراء الآن</button>
+            <button class="btn-cart">🛒</button>
           </div>
         </div>
+      </div>
 
+      <div class="product-card">
+        <span class="fav-icon">♡</span>
+        <div class="card-image"><img src="https://images.unsplash.com/photo-1620625515032-6ed0c1790c75?q=80&w=600"></div>
+        <div class="card-body">
+          <div class="card-title">ساعة رولكس ديت جست - أصلية</div>
+          <span class="price-pi">12,000 PI</span>
+          <div class="card-actions">
+            <button class="btn-buy" onclick="testPayment(12000, 'Rolex Watch')">شراء الآن</button>
+            <button class="btn-cart">🛒</button>
+          </div>
+        </div>
       </div>
     </div>
 
+    <nav class="bottom-nav">
+      <a href="#" class="nav-item active"><span class="nav-icon">🏠</span>الرئيسية</a>
+      <a href="#" class="nav-item"><span class="nav-icon">📂</span>التصنيفات</a>
+      <a href="#" class="nav-item"><span class="nav-icon">❤️</span>المفضلة</a>
+      <a href="#" class="nav-item"><span class="nav-icon">👤</span>حسابي</a>
+    </nav>
+
     <script>
-      const GCV_SAR = 1178133.75; // قيمة الإجماع بالريال
+      // 1. ربط Pi SDK وجلب اسم المستخدم وتحديث الرصيد (محاكاة)
+      async function initPiApp() {
+        if (window.Pi) {
+          try {
+            // تهيئة Pi
+            window.Pi.init({ version: "2.0", sandbox: false });
+            // طلب المصادقة
+            const auth = await window.Pi.authenticate(["username", "payments"], (incomplete) => {});
+            
+            const username = auth.user.username;
+            document.getElementById('usernameDisplay').textContent = username;
+            document.getElementById('userAvatar').textContent = username.charAt(0).toUpperCase();
+            document.getElementById('walletBalance').textContent = "المحفظة: 100 Pi (Testnet)"; // رصيد تجريبي
 
-      // 1. حساب الأسعار وعرضها عند التحميل
-      function updateDisplayPrices() {
-        document.querySelectorAll('.calc-pi').forEach(el => {
-          const sar = parseFloat(el.getAttribute('data-sar'));
-          el.textContent = (sar / GCV_SAR).toFixed(7);
-        });
-      }
-      window.onload = updateDisplayPrices;
-
-      // 2. وظيفة الدفع الفعلي عبر Pi SDK
-      async function handlePayment(sarAmount, productName) {
-        const piAmount = (sarAmount / GCV_SAR).toFixed(7);
-        const statusBox = document.getElementById('status-msg');
-
-        if (!window.Pi) {
-          alert("الرجاء فتح التطبيق من متصفح Pi");
-          return;
+          } catch (err) {
+            document.getElementById('usernameDisplay').textContent = "مستخدم زائر";
+          }
         }
+      }
 
+      // 2. وظيفة الدفع التجريبي عند الضغط على "شراء الآن"
+      async function testPayment(amount, productName) {
+        if (!window.Pi) return alert("افتح التطبيق من متصفح Pi");
+        
         try {
-          statusBox.style.display = "block";
-          statusBox.textContent = "جاري تحضير عملية الدفع لـ " + productName;
-
-          const payment = await window.Pi.createPayment({
-            amount: parseFloat(piAmount),
-            memo: "شراء " + productName + " من متجر حراج باي",
-            metadata: { sar_price: sarAmount, product: productName }
+          alert("جاري تحضير عملية الدفع لـ " + productName + " بقيمة " + amount + " Pi...");
+          
+          await window.Pi.createPayment({
+            amount: amount,
+            memo: "شراء " + productName + " من حراج باي (تجربة)",
+            metadata: { product: productName }
           }, {
-            onReadyForServerApproval: (paymentId) => {
-              statusBox.textContent = "بانتظار موافقة الخادم...";
-              // هنا يجب إرسال paymentId لخادمك (Netlify Function) للموافقة
-              console.log("Payment ID:", paymentId);
-            },
-            onReadyForServerCompletion: (paymentId, txid) => {
-              statusBox.textContent = "تم الدفع بنجاح! رقم المعاملة: " + txid;
-              alert("شكراً لك! تم استلام " + piAmount + " Pi بنجاح.");
-            },
-            onCancel: (paymentId) => {
-              statusBox.textContent = "تم إلغاء العملية";
-              setTimeout(() => statusBox.style.display = "none", 3000);
-            },
-            onError: (error, payment) => {
-              statusBox.textContent = "خطأ: " + error.message;
-            }
+            onReadyForServerApproval: (id) => console.log("Approved", id),
+            onReadyForServerCompletion: (id, txid) => alert("تم الدفع بنجاح! شكراً لك."),
+            onCancel: (id) => console.log("Cancelled"),
+            onError: (e) => console.error(e)
           });
-        } catch (err) {
-          statusBox.textContent = "فشلت العملية: " + err.message;
-        }
+        } catch (err) { console.error(err); }
       }
 
-      // تهيئة Pi SDK
-      if (window.Pi) {
-        window.Pi.init({ version: "2.0", sandbox: false });
-      }
+      // تشغيل التطبيق عند تحميل الصفحة
+      document.addEventListener("DOMContentLoaded", initPiApp);
     </script>
   </body>
 </html>
