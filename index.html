@@ -1,144 +1,273 @@
-      /* --- أنماط جديدة للحراج --- */
-      .hraj-header {
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1020" />
+    <title>حراج باي | HarajPi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet" />
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>
+      if (window.Pi && typeof window.Pi.init === "function") {
+        window.Pi.init({ version: "2.0", sandbox: false });
+      }
+    </script>
+    <style>
+      :root {
+        --primary-bg: #0b1020;
+        --card-bg: rgba(255, 255, 255, 0.05);
+        --accent-gold: #facc15;
+        --pi-purple: #4f86ff;
+        --text-main: #ffffff;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        font-family: 'Cairo', sans-serif;
+        min-height: 100vh;
+      }
+
+      /* الشريط العلوي */
+      header {
+        width: 100%;
+        background: rgba(11, 16, 32, 0.9);
+        backdrop-filter: blur(15px);
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        z-index: 1000;
+        box-sizing: border-box;
+      }
+
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        background: var(--pi-purple);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: var(--primary-bg);
+      }
+
+      .username {
+        font-weight: 700;
+        color: var(--accent-gold);
+        font-size: 14px;
+      }
+
+      .pay-btn {
+        background: var(--accent-gold);
+        color: var(--primary-bg);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      /* المحتوى الرئيسي */
+      main {
+        padding: 100px 20px 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .hero {
+        text-align: center;
         margin-bottom: 40px;
       }
-      .products-container {
-        width: 100%;
-        max-width: 1100px;
-        margin-bottom: 50px;
+
+      .hero h1 {
+        font-size: 32px;
+        margin: 0;
+        color: #fff;
       }
-      .section-title {
-        text-align: right;
-        font-size: 24px;
-        font-weight: 800;
-        color: #facc15; /* ذهبي */
-        margin-bottom: 20px;
-        padding-right: 15px;
+
+      .hero p {
+        opacity: 0.7;
+        font-size: 14px;
       }
-      .products-grid {
+
+      /* شبكة المنتجات */
+      .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 25px;
-        padding: 0 15px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
       }
-      .product-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+
+      .card {
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 20px;
         overflow: hidden;
         transition: transform 0.3s ease;
-        display: flex;
-        flex-direction: column;
       }
-      .product-card:hover {
+
+      .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
       }
-      .product-image {
+
+      .img-placeholder {
         width: 100%;
-        height: 200px;
-        overflow: hidden;
+        height: 180px;
+        background: #1a1f2e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: relative;
       }
-      .product-image img {
+
+      .img-placeholder img {
         width: 100%;
         height: 100%;
-        object-fit: cover; /* تجعل الصورة تملأ المربع دون تشويه */
+        object-fit: cover;
       }
-      .product-details {
-        padding: 20px;
-        text-align: right;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+
+      .badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.6);
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 11px;
       }
-      .product-title {
+
+      .details {
+        padding: 15px;
+      }
+
+      .details h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+      }
+
+      .price-tag {
+        color: var(--accent-gold);
         font-size: 18px;
-        font-weight: 700;
-        margin: 0 0 8px 0;
-        line-height: 1.4;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        gap: 5px;
       }
-      .product-loc {
+
+      .location {
         font-size: 12px;
         opacity: 0.5;
-        margin: 0 0 15px 0;
+        margin-top: 5px;
       }
-      .product-price {
-        font-size: 20px;
-        font-weight: 800;
-        color: #fff;
-        margin-bottom: 15px;
-      }
-      .pi-symbol {
-        color: #facc15;
-      }
-      .view-btn {
+
+      .buy-btn {
+        width: 100%;
+        margin-top: 15px;
         background: transparent;
-        color: #facc15;
-        border: 1px solid #facc15;
-        padding: 8px 0;
-        border-radius: 10px;
-        width: 100%;
+        border: 1px solid var(--pi-purple);
+        color: var(--pi-purple);
+        padding: 10px;
+        border-radius: 12px;
         cursor: pointer;
-        transition: all 0.3s ease;
+        font-weight: 600;
+        transition: 0.3s;
       }
-      .view-btn:hover {
-        background: #facc15;
-        color: #0b1020;
-      }
-      
-      .support-section {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-      }
-<main class="main-content">
-  <div class="hraj-header">
-    <h1 class="hero-title">حراج Pi</h1>
-    <p class="hero-subtitle">استكشف السلع المتوفرة في أول حراج على شبكة Pi البيئية.</p>
-  </div>
 
-  <div class="products-container">
-    <h2 class="section-title">أحدث الإعلانات</h2>
+      .buy-btn:hover {
+        background: var(--pi-purple);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="user-box">
+        <div class="avatar" id="userAvatar">؟</div>
+        <div class="user-info">
+          <div id="usernameDisplay" class="username">جاري التحميل...</div>
+          <div id="statusDisplay" style="font-size: 10px; opacity: 0.6;">متصل</div>
+        </div>
+      </div>
+      <button id="payBtn" class="pay-btn">دعم المشروع (1 Pi)</button>
+    </header>
     
-    <div class="products-grid">
-      <div class="product-card">
-        <div class="product-image">
-          <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=600&auto=format&fit=crop" alt="تويوتا كامري">
-        </div>
-        <div class="product-details">
-          <h3 class="product-title">تويوتا كامري 2022 - نظيفة جداً</h3>
-          <p class="product-loc">الرياض، السعودية</p>
-          <div class="product-price">
-            <span class="pi-symbol">π</span> 75,000 Pi
-          </div>
-          <button class="view-btn">تفاصيل الإعلان</button>
-        </div>
-      </div>
+    <main>
+      <section class="hero">
+        <h1>حراج Pi للسلع</h1>
+        <p>منصة بيع وشراء المنتجات باستخدام عملة Pi</p>
+      </section>
 
-      <div class="product-card">
-        <div class="product-image">
-          <img src="https://images.unsplash.com/photo-1664478546384-d2b02a1b9201?q=80&w=600&auto=format&fit=crop" alt="ايفون 14 برو">
-        </div>
-        <div class="product-details">
-          <h3 class="product-title">ايفون 14 برو ماكس 256 جيجا</h3>
-          <p class="product-loc">جدة، السعودية</p>
-          <div class="product-price">
-            <span class="pi-symbol">π</span> 4,500 Pi
+      <div class="grid">
+        <div class="card">
+          <div class="img-placeholder">
+            <span class="badge">جديد</span>
+            <img src="https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=600" alt="منتج">
           </div>
-          <button class="view-btn">تفاصيل الإعلان</button>
+          <div class="details">
+            <h3>ايفون 15 برو ماكس - 512GB</h3>
+            <div class="price-tag"><span>π</span> 5,200</div>
+            <div class="location">الرياض - السعودية</div>
+            <button class="buy-btn">تفاصيل الإعلان</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="img-placeholder">
+            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=600" alt="سيارة">
+          </div>
+          <div class="details">
+            <h3>سيارة مستعملة بحالة ممتازة</h3>
+            <div class="price-tag"><span>π</span> 85,000</div>
+            <div class="location">جدة - السعودية</div>
+            <button class="buy-btn">تفاصيل الإعلان</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="img-placeholder">
+            <img src="https://images.unsplash.com/photo-1542435503-956c469947f6?q=80&w=600" alt="لابتوب">
+          </div>
+          <div class="details">
+            <h3>ماك بوك اير M2</h3>
+            <div class="price-tag"><span>π</span> 3,400</div>
+            <div class="location">الدمام - السعودية</div>
+            <button class="buy-btn">تفاصيل الإعلان</button>
+          </div>
         </div>
       </div>
-      
-      </div>
-  </div>
+    </main>
 
-  <div class="support-section">
-    <div class="support-card">
-      <span class="pi-icon">π</span>
-      <h3>دعم المشروع</h3>
-      <p>اضغط على زر الدعم في الأعلى لتجربة إرسال 1 Pi عملة اختبار.</p>
-    </div>
-  </div>
-</main>
+    <script>
+      async function initPi() {
+        const userEl = document.getElementById('usernameDisplay');
+        const avatarEl = document.getElementById('userAvatar');
+        
+        if (!window.Pi) return;
+
+        try {
+          const auth = await window.Pi.authenticate(["username", "payments"], function(incomplete) {});
+          const name = auth.user.username;
+          userEl.textContent = name;
+          avatarEl.textContent = name.charAt(0).toUpperCase();
+        } catch (e) {
+          userEl.textContent = "Guest User";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", initPi);
+    </script>
+  </body>
+</html>
